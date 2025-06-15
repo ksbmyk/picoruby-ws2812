@@ -19,13 +19,13 @@ ATOM Matrix Product reference: https://www.switch-science.com/products/6260
 
 1. Copy files to `R2P2-ESP32/storage/home/`
 2. Flash to Atom Matrix:
-  ```
-  rake flash
-  ```
+   ```
+   rake flash
+   ```
 3. Start PicoRuby Shell:
-  ```
-  rake monitor
-  ```
+   ```
+   rake monitor
+   ```
 4. Run:
    ```ruby
    ./basic.rb

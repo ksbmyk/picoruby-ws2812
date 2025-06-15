@@ -13,15 +13,14 @@ A WS2812 LED driver gem for PicoRuby. Currently optimized for ESP32 (particularl
 Currently, this gem is only supported on ESP32 (Xtensa architecture). Support for other platforms is planned for future releases.
 
 1. Add the following line to your `picoruby/build_config/xtensa-esp.rb`:
-```ruby
-conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
-```
+   ```ruby
+   conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
+   ```
 
 2. Clean and rebuild:
-```
-rake clean
-rake build
-```
+   ```
+   rake clean build
+   ```
 
 ## Usage
 
