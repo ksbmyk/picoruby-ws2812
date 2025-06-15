@@ -1,0 +1,10 @@
+class RMTDriver
+  def initialize: (Integer pin, ?t0h_ns: Integer, ?t0l_ns: Integer, ?t1h_ns: Integer, ?t1l_ns: Integer, ?reset_ns: Integer) -> void
+  def write: (Array[Integer] bytes) -> void
+end
+
+class WS2812
+  def initialize: (RMTDriver driver) -> void
+  def show_rgb: (*Array[Integer, Integer, Integer] colors) -> void
+  def show_hex: (*Integer colors) -> void
+end
