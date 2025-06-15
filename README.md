@@ -39,6 +39,13 @@ led.show_rgb([255, 0, 0], [0, 255, 0], [0, 0, 255])  # Red, Green, Blue
 led.show_hex(0xFF0000, 0x00FF00, 0x0000FF)  # Red, Green, Blue
 ```
 
+## Examples
+
+Check out the `examples` directory for more detailed examples, including:
+- Basic LED control
+- 5x5 matrix control for Atom Matrix
+
+
 ## Platform Support
 
 ### Currently Supported
