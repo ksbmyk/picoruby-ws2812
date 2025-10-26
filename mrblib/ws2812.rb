@@ -60,34 +60,38 @@ class WS2812
   private
 
   def hsb_to_rgb(h, s, b)
-    # Normalize values
     h = h % 360
     s = s / 100.0
     b = b / 100.0
 
-    c = b * s
-    x = c * (1 - ((h / 60.0) % 2 - 1).abs)
-    m = b - c
-
-    r_prime, g_prime, b_prime = case h
-    when 0...60
-      [c, x, 0]
-    when 60...120
-      [x, c, 0]
-    when 120...180
-      [0, c, x]
-    when 180...240
-      [0, x, c]
-    when 240...300
-      [x, 0, c]
-    else
-      [c, 0, x]
+    if s == 0
+      gray = (b * 255).round
+      return [gray, gray, gray]
     end
 
-    r = ((r_prime + m) * 255).round
-    g = ((g_prime + m) * 255).round
-    b = ((b_prime + m) * 255).round
+    h_sector = h / 60.0
+    sector = h_sector.floor
+    fraction = h_sector - sector
 
-    [r, g, b]
+    tint1 = b * (1 - s)
+    tint2 = b * (1 - s * fraction)
+    tint3 = b * (1 - s * (1 - fraction))
+
+    r, g, b_rgb = case sector
+    when 0
+      [b, tint3, tint1]
+    when 1
+      [tint2, b, tint1]
+    when 2
+      [tint1, b, tint3]
+    when 3
+      [tint1, tint2, b]
+    when 4
+      [tint3, tint1, b]
+    else
+      [b, tint1, tint2]
+    end
+
+    [(r * 255).round, (g * 255).round, (b_rgb * 255).round]
   end
 end
