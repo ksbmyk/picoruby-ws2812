@@ -57,6 +57,8 @@ class WS2812
     @driver.write(bytes)
   end
 
+  private
+
   def hsb_to_rgb(h, s, b)
     h = h % 360
     s = s / 100.0
