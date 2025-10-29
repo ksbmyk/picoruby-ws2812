@@ -57,20 +57,18 @@ class WS2812
     @driver.write(bytes)
   end
 
-  private
-
   def hsb_to_rgb(h, s, b)
     h = h % 360
     s = s / 100.0
     b = b / 100.0
 
     if s == 0
-      gray = (b * 255).round
+      gray = (b * 255).to_i
       return [gray, gray, gray]
     end
 
     h_sector = h / 60.0
-    sector = h_sector.floor
+    sector = h_sector.to_i
     fraction = h_sector - sector
 
     tint1 = b * (1 - s)
@@ -92,6 +90,6 @@ class WS2812
       [b, tint1, tint2]
     end
 
-    [(r * 255).round, (g * 255).round, (b_rgb * 255).round]
+    [(r * 255).to_i, (g * 255).to_i, (b_rgb * 255).to_i]
   end
 end
