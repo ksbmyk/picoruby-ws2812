@@ -7,4 +7,5 @@ class WS2812
   def initialize: (RMTDriver driver) -> void
   def show_rgb: (*Array[Integer, Integer, Integer] colors) -> void
   def show_hex: (*Integer colors) -> void
+  def show_hsb: (*Array[Integer, Integer, Integer] colors) -> void
 end
