@@ -28,10 +28,15 @@ conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
    conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
    ```
 
-2. Add the following line to `CMakeLists.txt` in the `file(GLOB SOURCE_FILES ...)` section to include platform-specific drivers from external gems:
+2. Add the following line to `CMakeLists.txt` to include platform-specific drivers from external gems:
 
-   ```cmake
-   ${CMAKE_SOURCE_DIR}/lib/picoruby/build/repos/*/*/ports/rp2040/*.c
+   ```diff
+    file(GLOB SOURCE_FILES CONFIGURE_DEPENDS
+      src/*.c
+      ${CMAKE_SOURCE_DIR}/lib/picoruby/mrbgems/*/ports/rp2040/*.c
+      ${CMAKE_SOURCE_DIR}/lib/picoruby/mrbgems/*/ports/common/*.c
+   +  ${CMAKE_SOURCE_DIR}/lib/picoruby/build/repos/*/*/ports/rp2040/*.c
+    )
    ```
 
 3. Clean and rebuild:
@@ -101,7 +106,7 @@ Check out the `examples` directory for more detailed examples, including:
 
 - **RP2040/RP2350** (using PIO peripheral)
   - Hardware-accelerated bit-banging via PIO
-  - Tested on Raspberry Pi Pico and RP2350-based boards
+  - Tested on [Waveshare RP2350-Matrix](https://www.waveshare.com/wiki/RP2350-Matrix)
   - 800kHz WS2812 timing
 
 ## Dependencies
@@ -114,10 +119,9 @@ Check out the `examples` directory for more detailed examples, including:
 - M5Stack Atom Matrix (ESP32)
   - 5x5 WS2812 LED matrix
   - GPIO 27 (default)
-- Raspberry Pi Pico / RP2040-based boards
-  - Any GPIO pin with WS2812 LEDs
-- RP2350-based boards
-  - Any GPIO pin with WS2812 LEDs
+- [Waveshare RP2350-Matrix](https://www.waveshare.com/wiki/RP2350-Matrix)
+  - 8x8 WS2812 LED matrix
+  - GPIO 25
 
 ## License
 
