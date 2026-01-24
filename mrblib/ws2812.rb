@@ -1,5 +1,12 @@
-require 'rmt'
+# ESP32 RMT driver (requires picoruby-rmt)
+begin
+  require 'rmt'
+  RMT_AVAILABLE = true
+rescue LoadError
+  RMT_AVAILABLE = false
+end
 
+# ESP32 driver using RMT peripheral
 class RMTDriver
   def initialize(pin, t0h_ns: 350, t0l_ns: 800, t1h_ns: 700, t1l_ns: 600, reset_ns: 60000)
     @rmt = RMT.new(
@@ -14,6 +21,21 @@ class RMTDriver
 
   def write(bytes)
     @rmt.write(bytes)
+  end
+end
+
+# RP2040/RP2350 driver using PIO peripheral
+class PIODriver
+  def initialize(pin)
+    WS2812.init(pin)
+  end
+
+  def write(bytes)
+    WS2812.write(bytes)
+  end
+
+  def close
+    WS2812.deinit
   end
 end
 
