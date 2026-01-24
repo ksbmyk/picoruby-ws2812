@@ -49,7 +49,8 @@ WS2812_put_pixel(uint8_t g, uint8_t r, uint8_t b)
 {
     if (!ws2812_config.initialized) return;
 
-    uint32_t pixel = ((uint32_t)g << 16) | ((uint32_t)r << 8) | (uint32_t)b;
+    /* Convert GRB to RGB for WS2812 on RP2040/RP2350 */
+    uint32_t pixel = ((uint32_t)r << 16) | ((uint32_t)g << 8) | (uint32_t)b;
     ws2812_put_pixel(ws2812_config.pio, ws2812_config.sm, pixel);
 }
 
@@ -58,11 +59,11 @@ WS2812_write(const uint8_t *data, int len)
 {
     if (!ws2812_config.initialized) return;
 
-    /* Data is in GRB order, 3 bytes per pixel */
+    /* Data comes in GRB order, convert to RGB for WS2812 on RP2040/RP2350 */
     for (int i = 0; i + 2 < len; i += 3) {
-        uint32_t pixel = ((uint32_t)data[i] << 16) |
-                         ((uint32_t)data[i + 1] << 8) |
-                         (uint32_t)data[i + 2];
+        uint32_t pixel = ((uint32_t)data[i + 1] << 16) |  /* R */
+                         ((uint32_t)data[i] << 8) |       /* G */
+                         (uint32_t)data[i + 2];           /* B */
         ws2812_put_pixel(ws2812_config.pio, ws2812_config.sm, pixel);
     }
 }
