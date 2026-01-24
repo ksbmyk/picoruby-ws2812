@@ -3,8 +3,14 @@ class RMTDriver
   def write: (Array[Integer] bytes) -> void
 end
 
+class PIODriver
+  def initialize: (Integer pin) -> void
+  def write: (Array[Integer] bytes) -> void
+  def close: () -> void
+end
+
 class WS2812
-  def initialize: (RMTDriver driver) -> void
+  def initialize: (RMTDriver | PIODriver driver) -> void
   def show_rgb: (*Array[Integer, Integer, Integer] colors) -> void
   def show_hex: (*Integer colors) -> void
   def show_hsb: (*Array[Integer, Integer, Integer] colors) -> void
