@@ -20,19 +20,26 @@ Add the following line to your `picoruby/build_config/xtensa-esp.rb`:
 conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
 ```
 
-### RP2040/RP2350
+### RP2040/RP2350 (R2P2)
 
-Add the following line to your PicoRuby build configuration:
+1. Add the following line to your build configuration (e.g., `build_config/r2p2-picoruby-pico2.rb`):
 
-```ruby
-conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
-```
+   ```ruby
+   conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
+   ```
 
-Then clean and rebuild:
+2. Add the following line to `CMakeLists.txt` in the `file(GLOB SOURCE_FILES ...)` section to include platform-specific drivers from external gems:
 
-```
-rake clean build
-```
+   ```cmake
+   ${CMAKE_SOURCE_DIR}/lib/picoruby/build/repos/*/*/ports/rp2040/*.c
+   ```
+
+3. Clean and rebuild:
+
+   ```
+   rake picoruby:pico2:clean
+   rake picoruby:pico2:prod
+   ```
 
 ## Usage
 
