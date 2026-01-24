@@ -3,7 +3,7 @@
  */
 
 #include <mrubyc.h>
-#include "../../include/ws2812.h"
+#include "../include/ws2812.h"
 
 /*
  * WS2812._init(pin)
