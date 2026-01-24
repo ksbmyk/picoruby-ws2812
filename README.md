@@ -92,8 +92,8 @@ driver.close
 ## Examples
 
 Check out the `examples` directory for more detailed examples, including:
-- Basic LED control
-- 5x5 matrix control for Atom Matrix
+- `atom_matrix/` - 5x5 matrix control for M5Stack Atom Matrix (ESP32)
+- `rp2350_matrix/` - Examples for Waveshare RP2350-Matrix (RP2350)
 
 ## Platform Support
 
