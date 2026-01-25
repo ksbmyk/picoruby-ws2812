@@ -36,9 +36,6 @@ led.show_rgb([255, 0, 0], [0, 255, 0], [0, 0, 255])  # Red, Green, Blue
 
 # Control with hexadecimal color codes
 led.show_hex(0xFF0000, 0x00FF00, 0x0000FF)  # Red, Green, Blue
-
-# Control with HSB values
-led.show_hsb([0, 100, 100],[120, 100, 100],[240, 100, 100])  #Red, Green, Blue
 ```
 
 ## Examples
