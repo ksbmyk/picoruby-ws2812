@@ -1,0 +1,50 @@
+; WS2812 PIO program for RP2040/RP2350
+; Based on Raspberry Pi Pico SDK example
+;
+; WS2812 timing (800kHz = 1.25us per bit):
+;   T0H: 0.4us  (0 bit high time)
+;   T0L: 0.85us (0 bit low time)
+;   T1H: 0.8us  (1 bit high time)
+;   T1L: 0.45us (1 bit low time)
+
+.program ws2812
+.side_set 1
+
+.define public T1 2
+.define public T2 5
+.define public T3 3
+
+.wrap_target
+bitloop:
+    out x, 1       side 0 [T3 - 1] ; Side-set still low, get next bit into X
+    jmp !x do_zero side 1 [T1 - 1] ; If bit is 0, jump to do_zero, else continue
+do_one:
+    jmp  bitloop   side 1 [T2 - 1] ; Bit is 1, stay high for longer
+do_zero:
+    nop            side 0 [T2 - 1] ; Bit is 0, go low quickly
+.wrap
+
+% c-sdk {
+#include "hardware/clocks.h"
+
+static inline void ws2812_program_init(PIO pio, uint sm, uint offset, uint pin, float freq, bool rgbw) {
+    pio_gpio_init(pio, pin);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+
+    pio_sm_config c = ws2812_program_get_default_config(offset);
+    sm_config_set_sideset_pins(&c, pin);
+    sm_config_set_out_shift(&c, false, true, rgbw ? 32 : 24);
+    sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
+
+    int cycles_per_bit = ws2812_T1 + ws2812_T2 + ws2812_T3;
+    float div = clock_get_hz(clk_sys) / (freq * cycles_per_bit);
+    sm_config_set_clkdiv(&c, div);
+
+    pio_sm_init(pio, sm, offset, &c);
+    pio_sm_set_enabled(pio, sm, true);
+}
+
+static inline void ws2812_put_pixel(PIO pio, uint sm, uint32_t pixel_grb) {
+    pio_sm_put_blocking(pio, sm, pixel_grb << 8u);
+}
+%}
