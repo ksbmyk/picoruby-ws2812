@@ -73,7 +73,7 @@ mrbc_ws2812_init(mrbc_vm *vm)
 {
     mrbc_class *mrbc_class_WS2812 = mrbc_define_class(vm, "WS2812", mrbc_class_object);
 
-    mrbc_define_method(vm, mrbc_class_WS2812, "init", c__init);
-    mrbc_define_method(vm, mrbc_class_WS2812, "write", c__write);
-    mrbc_define_method(vm, mrbc_class_WS2812, "deinit", c__deinit);
+    mrbc_define_method(vm, mrbc_class_WS2812, "_init", c__init);
+    mrbc_define_method(vm, mrbc_class_WS2812, "_write", c__write);
+    mrbc_define_method(vm, mrbc_class_WS2812, "_deinit", c__deinit);
 }
