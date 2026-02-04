@@ -1,10 +1,9 @@
 require 'ws2812'
 
-# RP2350-Matrix's LED is connected to GPIO 25
-driver = PIODriver.new(25)
-led = WS2812.new(driver)
+# RP2350-Matrix: 8x8 LED matrix on GPIO 25
+led = WS2812.new(pin: 25, num_leds: 64)
 
-# Ruby logo pattern for 8x8 matrix
+# Ruby logo patterns for 8x8 matrix
 # 0x000000: black, 0xFF0000: red
 FRAME1 = [
   0x000000, 0x000000, 0xFF0000, 0xFF0000, 0xFF0000, 0xFF0000, 0x000000, 0x000000,
@@ -28,10 +27,17 @@ FRAME2 = [
   0x000000, 0x000000, 0x000000, 0xFF0000, 0xFF0000, 0x000000, 0x000000, 0x000000
 ]
 
+def show_frame(led, frame)
+  frame.each_with_index do |color, i|
+    led.set_hex(i, color)
+  end
+  led.show
+end
+
 loop do
-  led.show_hex(*FRAME1)
+  show_frame(led, FRAME1)
   sleep 1
 
-  led.show_hex(*FRAME2)
+  show_frame(led, FRAME2)
   sleep 1
 end

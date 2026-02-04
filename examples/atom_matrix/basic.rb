@@ -1,14 +1,23 @@
 require 'ws2812'
 
-# Atom Matrix's LED is connected to GPIO 27
-rmt = RMTDriver.new(27)
-led = WS2812.new(rmt)
+# Atom Matrix: 5x5 LED matrix on GPIO 27
+led = WS2812.new(pin: 27, num_leds: 25)
 
-# basic color display
-led.show_rgb([255, 0, 0])     # red
+# basic color display (single LED)
+led.set_rgb(0, 255, 0, 0)  # red
+led.show
 sleep 1
-led.show_rgb([0, 255, 0])     # green
+
+led.set_rgb(0, 0, 255, 0)  # green
+led.show
 sleep 1
-led.show_rgb([0, 0, 255])     # blue
+
+led.set_rgb(0, 0, 0, 255)  # blue
+led.show
 sleep 1
-led.show_rgb([255, 255, 255]) # white
+
+led.fill(255, 255, 255)    # white (all LEDs)
+led.show
+sleep 1
+
+led.clear
