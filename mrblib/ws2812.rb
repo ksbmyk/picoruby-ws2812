@@ -1,82 +1,59 @@
-# ESP32 RMT driver (requires picoruby-rmt)
-begin
-  require 'rmt'
-  RMT_AVAILABLE = true
-rescue LoadError
-  RMT_AVAILABLE = false
-end
+class WS2812
+  attr_reader :brightness
 
-# ESP32 driver using RMT peripheral
-class RMTDriver
-  def initialize(pin, t0h_ns: 350, t0l_ns: 800, t1h_ns: 700, t1l_ns: 600, reset_ns: 60000)
-    @rmt = RMT.new(
-      pin,
-      t0h_ns: t0h_ns,
-      t0l_ns: t0l_ns,
-      t1h_ns: t1h_ns,
-      t1l_ns: t1l_ns,
-      reset_ns: reset_ns
-    )
+  def initialize(pin:, num_leds:)
+    @num_leds = num_leds
+    @brightness = 100
+    @buffer = Array.new(num_leds * 3, 0)
+    _init(pin)
   end
 
-  def write(bytes)
-    @rmt.write(bytes)
-  end
-end
-
-# RP2040/RP2350 driver using PIO peripheral
-class PIODriver
-  def initialize(pin)
-    WS2812.init(pin)
+  def set_rgb(index, r, g, b)
+    return if index < 0 || index >= @num_leds
+    @buffer[index * 3]     = r & 0xFF
+    @buffer[index * 3 + 1] = g & 0xFF
+    @buffer[index * 3 + 2] = b & 0xFF
   end
 
-  def write(bytes)
-    WS2812.write(bytes)
+  def set_hsb(index, h, s, b)
+    r, g, b_rgb = hsb_to_rgb(h, s, b)
+    set_rgb(index, r, g, b_rgb)
+  end
+
+  def set_hex(index, hex)
+    r = (hex >> 16) & 0xFF
+    g = (hex >> 8) & 0xFF
+    b = hex & 0xFF
+    set_rgb(index, r, g, b)
+  end
+
+  def fill(r, g, b)
+    @num_leds.times { |i| set_rgb(i, r, g, b) }
+  end
+
+  def brightness=(val)
+    @brightness = [[val, 0].max, 100].min
+  end
+
+  def show
+    bytes = []
+    scale = @brightness / 100.0
+    @num_leds.times do |i|
+      r = (@buffer[i * 3] * scale).to_i
+      g = (@buffer[i * 3 + 1] * scale).to_i
+      b = (@buffer[i * 3 + 2] * scale).to_i
+      bytes << g << r << b  # GRB order
+    end
+    _write(bytes)
+  end
+
+  def clear
+    @buffer.fill(0)
+    show
   end
 
   def close
-    WS2812.deinit
-  end
-end
-
-class WS2812
-  def initialize(driver)
-    @driver = driver
-  end
-
-  # ex. show([255, 0, 0], [0, 255, 0], [0, 0, 255]) # Array of RGB values
-  def show_rgb(*colors)
-    bytes = []
-    colors.each do |color|
-      r, g, b = color
-      bytes << g << r << b
-    end
-
-    @driver.write(bytes)
-  end
-
-  # ex. show(0xff0000, 0x00ff00, 0x0000ff)  # Hexadecimal RGB values
-  def show_hex(*colors)
-    bytes = []
-    colors.each do |color|
-      r, g, b = [(color>>16)&0xFF, (color>>8)&0xFF, color&0xFF]
-      bytes << g << r << b
-    end
-
-    @driver.write(bytes)
-  end
-
-  # ex. show_hsb([0, 100, 100], [120, 100, 100], [240, 100, 100])
-  # H: 0-360, S: 0-100, B: 0-100
-  def show_hsb(*colors)
-    bytes = []
-    colors.each do |color|
-      h, s, b = color
-      r, g, b_rgb = hsb_to_rgb(h, s, b)
-      bytes << g << r << b_rgb
-    end
-
-    @driver.write(bytes)
+    _deinit
   end
 
   private
