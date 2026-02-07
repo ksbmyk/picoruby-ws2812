@@ -1,26 +1,17 @@
 /*
- * WS2812 driver for ESP32 (wraps picoruby-rmt)
+ * WS2812 stub for ESP32
+ * ESP32 uses pure Ruby implementation with picoruby-rmt
  */
 
-#include "rmt.h"
-#include "../include/ws2812.h"
+#include <mrubyc.h>
 
-static RMT_symbol_dulation_t ws2812_timing = {
-    .t0h_ns = 350,
-    .t0l_ns = 800,
-    .t1h_ns = 700,
-    .t1l_ns = 600,
-    .reset_ns = 60000
-};
-
-int WS2812_init(uint8_t pin) {
-    return RMT_init((uint32_t)pin, &ws2812_timing);
-}
-
-void WS2812_write(const uint8_t *data, int len) {
-    RMT_write((uint8_t *)data, (uint32_t)len);
-}
-
-void WS2812_deinit(void) {
-    /* picoruby-rmt does not have deinit function yet */
+/*
+ * Empty init function for ESP32
+ * The WS2812 class is implemented in pure Ruby using RMT
+ */
+void
+mrbc_ws2812_init(mrbc_vm *vm)
+{
+    /* No C bindings needed on ESP32 */
+    (void)vm;
 }
