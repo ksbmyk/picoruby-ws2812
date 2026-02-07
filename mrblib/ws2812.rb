@@ -16,10 +16,10 @@ class WS2812
     reset_ns: 60000
   }
 
-  def initialize(pin:, num_leds:)
-    @num_leds = num_leds
+  def initialize(pin:, num:)
+    @num_leds = num
     @brightness = 100
-    @buffer = Array.new(num_leds * 3, 0)
+    @buffer = Array.new(num * 3, 0)
 
     # ESP32: use RMT directly, RP2040/RP2350: use C bindings
     begin

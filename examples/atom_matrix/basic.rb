@@ -1,7 +1,7 @@
 require 'ws2812'
 
 # Atom Matrix: 5x5 LED matrix on GPIO 27
-led = WS2812.new(pin: 27, num_leds: 25)
+led = WS2812.new(pin: 27, num: 25)
 
 # basic color display (single LED)
 led.set_rgb(0, 255, 0, 0)  # red

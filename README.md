@@ -53,7 +53,7 @@ conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
 require 'ws2812'
 
 # Initialize (specify GPIO pin and number of LEDs)
-led = WS2812.new(pin: 25, num_leds: 64)
+led = WS2812.new(pin: 25, num: 64)
 
 # Set individual LED colors (writes to internal buffer)
 led.set_rgb(0, 255, 0, 0)      # LED 0: Red (R, G, B: 0-255)
@@ -81,11 +81,11 @@ led.close
 ### Constructor
 
 ```ruby
-WS2812.new(pin:, num_leds:)
+WS2812.new(pin:, num:)
 ```
 
 - `pin`: GPIO pin number (Integer)
-- `num_leds`: Number of LEDs (Integer)
+- `num`: Number of LEDs (Integer)
 
 ### Methods
 

@@ -1,7 +1,7 @@
 require 'ws2812'
 
 # RP2350-Matrix: 8x8 LED matrix on GPIO 25
-led = WS2812.new(pin: 25, num_leds: 64)
+led = WS2812.new(pin: 25, num: 64)
 
 # Ruby logo patterns for 8x8 matrix
 # 0x000000: black, 0xFF0000: red

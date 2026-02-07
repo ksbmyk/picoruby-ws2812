@@ -2,7 +2,7 @@ require 'ws2812'
 
 # RP2350-Matrix: 8x8 LED matrix on GPIO 25
 GRID_SIZE = 8
-led = WS2812.new(pin: 25, num_leds: GRID_SIZE * GRID_SIZE)
+led = WS2812.new(pin: 25, num: GRID_SIZE * GRID_SIZE)
 
 # Sequential lighting animation
 def sequence_animation(led, grid_size, delay_ms: 100)
