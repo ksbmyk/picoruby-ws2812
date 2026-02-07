@@ -1,9 +1,16 @@
 /*
- * WS2812 mruby/c bindings for RP2040/RP2350 (PIO driver)
+ * WS2812 mruby/c bindings
  */
 
 #include <mrubyc.h>
 #include "../include/ws2812.h"
+
+/*
+ * Weak stub implementations - overridden by platform-specific ports
+ */
+__attribute__((weak)) int WS2812_init(uint8_t pin) { (void)pin; return 0; }
+__attribute__((weak)) void WS2812_write(const uint8_t *data, int len) { (void)data; (void)len; }
+__attribute__((weak)) void WS2812_deinit(void) {}
 
 /*
  * WS2812._init(pin)
