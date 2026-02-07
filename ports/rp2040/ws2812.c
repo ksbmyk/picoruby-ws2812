@@ -1,4 +1,5 @@
 #include "pico/stdlib.h"
+#include "pico/time.h"
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
 
@@ -66,6 +67,12 @@ WS2812_write(const uint8_t *data, int len)
                          (uint32_t)data[i + 2];           /* B */
         ws2812_put_pixel(ws2812_config.pio, ws2812_config.sm, pixel);
     }
+
+    /* Wait for FIFO to drain and add reset time (>50us) */
+    while (!pio_sm_is_tx_fifo_empty(ws2812_config.pio, ws2812_config.sm)) {
+        tight_loop_contents();
+    }
+    sleep_us(60);
 }
 
 void
