@@ -7,15 +7,6 @@ end
 class WS2812
   attr_reader :brightness
 
-  # WS2812 timing parameters (nanoseconds)
-  WS2812_TIMING = {
-    t0h_ns: 350,
-    t0l_ns: 800,
-    t1h_ns: 700,
-    t1l_ns: 600,
-    reset_ns: 60000
-  }
-
   def initialize(pin:, num:)
     @num_leds = num
     @brightness = 100
