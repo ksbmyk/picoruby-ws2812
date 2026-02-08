@@ -1,17 +1,20 @@
-class RMTDriver
-  def initialize: (Integer pin, ?t0h_ns: Integer, ?t0l_ns: Integer, ?t1h_ns: Integer, ?t1l_ns: Integer, ?reset_ns: Integer) -> void
-  def write: (Array[Integer] bytes) -> void
-end
-
-class PIODriver
-  def initialize: (Integer pin) -> void
-  def write: (Array[Integer] bytes) -> void
-  def close: () -> void
-end
-
 class WS2812
-  def initialize: (RMTDriver | PIODriver driver) -> void
-  def show_rgb: (*Array[Integer, Integer, Integer] colors) -> void
-  def show_hex: (*Integer colors) -> void
-  def show_hsb: (*Array[Integer, Integer, Integer] colors) -> void
+  attr_reader brightness: Integer
+
+  def initialize: (pin: Integer, num: Integer) -> void
+  def set_rgb: (Integer index, Integer r, Integer g, Integer b) -> void
+  def set_hsb: (Integer index, Integer h, Integer s, Integer b) -> void
+  def set_hex: (Integer index, Integer hex) -> void
+  def fill: (Integer r, Integer g, Integer b) -> void
+  def brightness=: (Integer val) -> Integer
+  def show: () -> void
+  def clear: () -> void
+  def close: () -> void
+
+  private
+
+  def hsb_to_rgb: (Integer h, Integer s, Integer b) -> [Integer, Integer, Integer]
+  def _init: (Integer pin) -> void
+  def _show: (Array[Integer] buffer, Integer brightness) -> void
+  def _deinit: () -> void
 end

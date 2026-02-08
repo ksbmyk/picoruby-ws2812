@@ -5,7 +5,8 @@ A WS2812 LED driver gem for PicoRuby. Supports ESP32 (using RMT peripheral) and 
 ## Features
 
 - Control LEDs using RGB values, hexadecimal color codes, or HSB values
-- Control multiple LEDs simultaneously
+- Buffered LED control with explicit `show` command
+- Global brightness control (0-100%)
 - Platform-specific optimized drivers:
   - ESP32: RMT (Remote Control) peripheral
   - RP2040/RP2350: PIO (Programmable I/O) peripheral
@@ -48,46 +49,65 @@ conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
 
 ## Usage
 
-### ESP32 (RMTDriver)
-
 ```ruby
 require 'ws2812'
 
-# Initialize with RMT driver (specify GPIO pin)
-driver = RMTDriver.new(27)
-led = WS2812.new(driver)
+# Initialize (specify GPIO pin and number of LEDs)
+led = WS2812.new(pin: 25, num: 64)
 
-# Control with RGB values
-led.show_rgb([255, 0, 0], [0, 255, 0], [0, 0, 255])  # Red, Green, Blue
+# Set individual LED colors (writes to internal buffer)
+led.set_rgb(0, 255, 0, 0)      # LED 0: Red (R, G, B: 0-255)
+led.set_hex(1, 0x00FF00)       # LED 1: Green (24-bit hex)
+led.set_hsb(2, 240, 100, 100)  # LED 2: Blue (H: 0-360, S: 0-100, B: 0-100)
 
-# Control with hexadecimal color codes
-led.show_hex(0xFF0000, 0x00FF00, 0x0000FF)  # Red, Green, Blue
+# Fill all LEDs with the same color
+led.fill(255, 255, 255)        # All white
 
-# Control with HSB values (H: 0-360, S: 0-100, B: 0-100)
-led.show_hsb([0, 100, 100], [120, 100, 100], [240, 100, 100])  # Red, Green, Blue
-```
+# Adjust brightness (0-100%)
+led.brightness = 50
 
-### RP2040/RP2350 (PIODriver)
+# Send buffer to LEDs
+led.show
 
-```ruby
-require 'ws2812'
-
-# Initialize with PIO driver (specify GPIO pin)
-driver = PIODriver.new(25)
-led = WS2812.new(driver)
-
-# Control with RGB values
-led.show_rgb([255, 0, 0], [0, 255, 0], [0, 0, 255])  # Red, Green, Blue
-
-# Control with hexadecimal color codes
-led.show_hex(0xFF0000, 0x00FF00, 0x0000FF)  # Red, Green, Blue
-
-# Control with HSB values
-led.show_hsb([0, 100, 100], [120, 100, 100], [240, 100, 100])  # Red, Green, Blue
+# Turn off all LEDs
+led.clear
 
 # Clean up when done
-driver.close
+led.close
 ```
+
+## API Reference
+
+### Constructor
+
+```ruby
+WS2812.new(pin:, num:)
+```
+
+- `pin`: GPIO pin number (Integer)
+- `num`: Number of LEDs (Integer)
+
+### Methods
+
+| Method | Description |
+|--------|-------------|
+| `set_rgb(index, r, g, b)` | Set LED color using RGB values (0-255) |
+| `set_hex(index, hex)` | Set LED color using 24-bit hex (0xRRGGBB) |
+| `set_hsb(index, h, s, b)` | Set LED color using HSB (H: 0-360, S: 0-100, B: 0-100) |
+| `fill(r, g, b)` | Fill all LEDs with the same RGB color |
+| `brightness` | Get current brightness (0-100) |
+| `brightness=` | Set brightness (0-100) |
+| `show` | Send buffer to LEDs |
+| `clear` | Turn off all LEDs (fills buffer with 0 and calls show) |
+| `close` | Release driver resources |
+
+### Notes
+
+- Color values are written to an internal buffer
+- Call `show` to send the buffer to the LEDs
+- Out-of-range index values are silently ignored
+- RGB values are masked to 0-255
+- Brightness is applied at `show` time (buffer values are not modified)
 
 ## Examples
 
