@@ -9,7 +9,7 @@
  * Weak stub implementations - overridden by platform-specific ports
  */
 __attribute__((weak)) int WS2812_init(uint8_t pin) { (void)pin; return 0; }
-__attribute__((weak)) void WS2812_write(const uint8_t *data, int len) { (void)data; (void)len; }
+__attribute__((weak)) void WS2812_show(const uint8_t *rgb_data, int num_leds, uint8_t brightness) { (void)rgb_data; (void)num_leds; (void)brightness; }
 __attribute__((weak)) void WS2812_deinit(void) {}
 
 /*
@@ -31,19 +31,23 @@ c__init(mrbc_vm *vm, mrbc_value *v, int argc)
 }
 
 /*
- * WS2812._write(data)
- * Send multiple pixels from array (GRB order)
+ * WS2812._show(buffer, brightness)
+ * Send pixels with brightness scaling (RGB order input)
  */
 static void
-c__write(mrbc_vm *vm, mrbc_value *v, int argc)
+c__show(mrbc_vm *vm, mrbc_value *v, int argc)
 {
     mrbc_value data = v[1];
+    int brightness = GET_INT_ARG(2);
+
     if (mrbc_type(data) != MRBC_TT_ARRAY) {
         mrbc_raise(vm, MRBC_CLASS(ArgumentError), "data must be an Array");
         return;
     }
 
     int len = mrbc_array_size(&data);
+    int num_leds = len / 3;
+
     uint8_t *buf = mrbc_alloc(vm, len);
     if (!buf) {
         mrbc_raise(vm, MRBC_CLASS(RuntimeError), "memory allocation failed");
@@ -54,7 +58,7 @@ c__write(mrbc_vm *vm, mrbc_value *v, int argc)
         buf[i] = (uint8_t)mrbc_integer(mrbc_array_get(&data, i));
     }
 
-    WS2812_write(buf, len);
+    WS2812_show(buf, num_leds, (uint8_t)brightness);
 
     mrbc_free(vm, buf);
 
@@ -81,6 +85,6 @@ mrbc_ws2812_init(mrbc_vm *vm)
     mrbc_class *mrbc_class_WS2812 = mrbc_define_class(vm, "WS2812", mrbc_class_object);
 
     mrbc_define_method(vm, mrbc_class_WS2812, "_init", c__init);
-    mrbc_define_method(vm, mrbc_class_WS2812, "_write", c__write);
+    mrbc_define_method(vm, mrbc_class_WS2812, "_show", c__show);
     mrbc_define_method(vm, mrbc_class_WS2812, "_deinit", c__deinit);
 }

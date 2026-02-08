@@ -55,19 +55,20 @@ class WS2812
   end
 
   def show
-    bytes = []
-    scale = @brightness / 100.0
-    @num_leds.times do |i|
-      r = (@buffer[i * 3] * scale).to_i
-      g = (@buffer[i * 3 + 1] * scale).to_i
-      b = (@buffer[i * 3 + 2] * scale).to_i
-      bytes << g << r << b  # GRB order
-    end
-
     if @rmt
+      # ESP32: keep Ruby implementation for RMT
+      bytes = []
+      scale = @brightness / 100.0
+      @num_leds.times do |i|
+        r = (@buffer[i * 3] * scale).to_i
+        g = (@buffer[i * 3 + 1] * scale).to_i
+        b = (@buffer[i * 3 + 2] * scale).to_i
+        bytes << g << r << b  # GRB order
+      end
       @rmt.write(bytes)
     else
-      _write(bytes)
+      # RP2040/RP2350: use optimized C implementation
+      _show(@buffer, @brightness)
     end
   end
 

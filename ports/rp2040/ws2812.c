@@ -76,6 +76,29 @@ WS2812_write(const uint8_t *data, int len)
 }
 
 void
+WS2812_show(const uint8_t *rgb_data, int num_leds, uint8_t brightness)
+{
+    if (!ws2812_config.initialized) return;
+
+    for (int i = 0; i < num_leds; i++) {
+        /* Apply brightness scaling with integer math */
+        uint8_t r = (rgb_data[i * 3] * brightness) / 100;
+        uint8_t g = (rgb_data[i * 3 + 1] * brightness) / 100;
+        uint8_t b = (rgb_data[i * 3 + 2] * brightness) / 100;
+
+        /* GRB order for WS2812 */
+        uint32_t pixel = ((uint32_t)g << 16) | ((uint32_t)r << 8) | (uint32_t)b;
+        ws2812_put_pixel(ws2812_config.pio, ws2812_config.sm, pixel);
+    }
+
+    /* Wait for FIFO to drain and add reset time (>50us) */
+    while (!pio_sm_is_tx_fifo_empty(ws2812_config.pio, ws2812_config.sm)) {
+        tight_loop_contents();
+    }
+    sleep_us(60);
+}
+
+void
 WS2812_deinit(void)
 {
     if (!ws2812_config.initialized) return;

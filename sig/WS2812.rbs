@@ -15,6 +15,6 @@ class WS2812
 
   def hsb_to_rgb: (Integer h, Integer s, Integer b) -> [Integer, Integer, Integer]
   def _init: (Integer pin) -> void
-  def _write: (Array[Integer] bytes) -> void
+  def _show: (Array[Integer] buffer, Integer brightness) -> void
   def _deinit: () -> void
 end
