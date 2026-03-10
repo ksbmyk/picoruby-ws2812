@@ -36,8 +36,18 @@ conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
       src/*.c
       ${CMAKE_SOURCE_DIR}/lib/picoruby/mrbgems/*/ports/rp2040/*.c
       ${CMAKE_SOURCE_DIR}/lib/picoruby/mrbgems/*/ports/common/*.c
-   +  ${CMAKE_SOURCE_DIR}/lib/picoruby/build/repos/*/*/ports/rp2040/*.c
+   +  ${CMAKE_SOURCE_DIR}/lib/picoruby/build/repos/${MRUBY_CONFIG}/*/ports/rp2040/*.c
     )
+   ```
+
+   ```diff
+    pico_generate_pio_header(${PROJECT_NAME}
+      ${CMAKE_SOURCE_DIR}/lib/picoruby/mrbgems/picoruby-psg/ports/rp2040/psg_drv_mcp4922_pio.pio
+    )
+
+   +pico_generate_pio_header(${PROJECT_NAME}
+   +  ${CMAKE_SOURCE_DIR}/lib/picoruby/build/repos/${MRUBY_CONFIG}/picoruby-ws2812/ports/rp2040/ws2812.pio
+   +)
    ```
 
 3. Clean and rebuild:
