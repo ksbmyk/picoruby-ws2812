@@ -7,10 +7,11 @@ end
 class WS2812
   attr_reader :brightness
 
-  def initialize(pin:, num:)
+  def initialize(pin:, num:, order: :grb)
     @num_leds = num
     @brightness = 100
     @buffer = Array.new(num * 3, 0)
+    @order = order
 
     # ESP32: use RMT directly, RP2040/RP2350: use C bindings
     begin
@@ -63,12 +64,16 @@ class WS2812
         r = (@buffer[i * 3] * scale).to_i
         g = (@buffer[i * 3 + 1] * scale).to_i
         b = (@buffer[i * 3 + 2] * scale).to_i
-        bytes << g << r << b  # GRB order
+        if @order == :rgb
+          bytes << r << g << b
+        else
+          bytes << g << r << b
+        end
       end
       @rmt.write(bytes)
     else
       # RP2040/RP2350: use optimized C implementation
-      _show(@buffer, @brightness)
+      _show(@buffer, @brightness, @order == :rgb ? 1 : 0)
     end
   end
 

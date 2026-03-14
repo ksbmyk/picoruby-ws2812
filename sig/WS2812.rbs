@@ -1,7 +1,7 @@
 class WS2812
   attr_reader brightness: Integer
 
-  def initialize: (pin: Integer, num: Integer) -> void
+  def initialize: (pin: Integer, num: Integer, ?order: Symbol) -> void
   def set_rgb: (Integer index, Integer r, Integer g, Integer b) -> void
   def set_hsb: (Integer index, Integer h, Integer s, Integer b) -> void
   def set_hex: (Integer index, Integer hex) -> void
@@ -15,6 +15,6 @@ class WS2812
 
   def hsb_to_rgb: (Integer h, Integer s, Integer b) -> [Integer, Integer, Integer]
   def _init: (Integer pin) -> void
-  def _show: (Array[Integer] buffer, Integer brightness) -> void
+  def _show: (Array[Integer] buffer, Integer brightness, Integer color_order) -> void
   def _deinit: () -> void
 end

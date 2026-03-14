@@ -76,7 +76,7 @@ WS2812_write(const uint8_t *data, int len)
 }
 
 void
-WS2812_show(const uint8_t *rgb_data, int num_leds, uint8_t brightness)
+WS2812_show(const uint8_t *rgb_data, int num_leds, uint8_t brightness, uint8_t color_order)
 {
     if (!ws2812_config.initialized) return;
 
@@ -86,8 +86,12 @@ WS2812_show(const uint8_t *rgb_data, int num_leds, uint8_t brightness)
         uint8_t g = (rgb_data[i * 3 + 1] * brightness) / 100;
         uint8_t b = (rgb_data[i * 3 + 2] * brightness) / 100;
 
-        /* GRB order for WS2812 */
-        uint32_t pixel = ((uint32_t)g << 16) | ((uint32_t)r << 8) | (uint32_t)b;
+        uint32_t pixel;
+        if (color_order == WS2812_ORDER_RGB) {
+            pixel = ((uint32_t)r << 16) | ((uint32_t)g << 8) | (uint32_t)b;
+        } else {  /* GRB (default) */
+            pixel = ((uint32_t)g << 16) | ((uint32_t)r << 8) | (uint32_t)b;
+        }
         ws2812_put_pixel(ws2812_config.pio, ws2812_config.sm, pixel);
     }
 

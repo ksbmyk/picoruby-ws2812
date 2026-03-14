@@ -17,8 +17,12 @@ void WS2812_put_pixel(uint8_t g, uint8_t r, uint8_t b);
 /* Send multiple pixels from array (GRB order, deprecated) */
 void WS2812_write(const uint8_t *data, int len);
 
-/* Show pixels with brightness scaling (RGB order input) */
-void WS2812_show(const uint8_t *rgb_data, int num_leds, uint8_t brightness);
+/* Color order constants */
+#define WS2812_ORDER_GRB 0
+#define WS2812_ORDER_RGB 1
+
+/* Show pixels with brightness scaling (RGB order input, reordered by color_order) */
+void WS2812_show(const uint8_t *rgb_data, int num_leds, uint8_t brightness, uint8_t color_order);
 
 /* Deinitialize WS2812 driver */
 void WS2812_deinit(void);
