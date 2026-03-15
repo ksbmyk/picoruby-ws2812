@@ -91,11 +91,12 @@ led.close
 ### Constructor
 
 ```ruby
-WS2812.new(pin:, num:)
+WS2812.new(pin:, num:, order: :grb)
 ```
 
 - `pin`: GPIO pin number (Integer)
 - `num`: Number of LEDs (Integer)
+- `order`: Color order (Symbol, optional). `:grb` (default, standard WS2812) or `:rgb`
 
 ### Methods
 
