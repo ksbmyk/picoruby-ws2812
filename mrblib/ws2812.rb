@@ -55,17 +55,14 @@ class WS2812
   end
 
   def show
-    converted = _convert(@buffer, @brightness, @order == :rgb ? 1 : 0)
     if @rmt
-      @rmt.write(converted)
+      @rmt.write(_convert(@buffer, @brightness, @order == :rgb ? 1 : 0))
     else
-      i = 0
-      while i + 2 < converted.length
-        pixel = (converted[i] << 24) | (converted[i + 1] << 16) | (converted[i + 2] << 8)
+      _convert(@buffer, @brightness, @order == :rgb ? 1 : 0, 1).each do |pixel|
         @sm.put(pixel)
-        i += 3
       end
     end
+    nil
   end
 
   def clear
