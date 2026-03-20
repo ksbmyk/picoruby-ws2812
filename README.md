@@ -15,11 +15,28 @@ A WS2812 LED driver gem for PicoRuby. Supports ESP32 (using RMT peripheral) and 
 
 ### ESP32
 
-Add the following line to your `picoruby/build_config/xtensa-esp.rb`:
+1. Add the following line to your `picoruby/build_config/xtensa-esp.rb`:
 
-```ruby
-conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
-```
+   ```ruby
+   conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
+   ```
+
+2. Add the following lines to your ESP32 component's `CMakeLists.txt`:
+
+   ```diff
+    idf_component_register(
+      SRCS
+        ...
+        ${COMPONENT_DIR}/picoruby/mrbgems/picoruby-rmt/ports/esp32/rmt.c
+   +    ${COMPONENT_DIR}/picoruby/mrbgems/picoruby-ws2812/ports/esp32/ws2812.c
+        ...
+      INCLUDE_DIRS
+        ...
+   +    ${COMPONENT_DIR}/picoruby/mrbgems/picoruby-ws2812/include
+   +    ${COMPONENT_DIR}/picoruby/mrbgems/picoruby-rmt/include
+        ...
+    )
+   ```
 
 ### RP2040/RP2350 (R2P2)
 
