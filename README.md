@@ -23,6 +23,8 @@ conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
 
 ### RP2040/RP2350 (R2P2)
 
+Note: RP2040/RP2350 support requires a recent PicoRuby master branch that includes `picoruby-pio`.
+
 Add the following line to your build configuration (e.g., `build_config/r2p2-picoruby-pico2.rb`):
 
 ```ruby
