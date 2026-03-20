@@ -6,13 +6,6 @@
 #include "../include/ws2812.h"
 
 /*
- * Weak stub implementations - overridden by platform-specific ports
- */
-__attribute__((weak)) int WS2812_init(uint8_t pin) { (void)pin; return 0; }
-__attribute__((weak)) void WS2812_show(const uint8_t *rgb_data, int num_leds, uint8_t brightness, uint8_t color_order) { (void)rgb_data; (void)num_leds; (void)brightness; (void)color_order; }
-__attribute__((weak)) void WS2812_deinit(void) {}
-
-/*
  * WS2812._init(pin)
  * Initialize WS2812 PIO driver on specified GPIO pin
  */

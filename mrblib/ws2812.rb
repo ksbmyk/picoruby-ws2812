@@ -1,9 +1,3 @@
-# Try to load RMT for ESP32 (ignore if not available on RP2040/RP2350)
-begin
-  require 'rmt'
-rescue LoadError
-end
-
 class WS2812
   attr_reader :brightness
 
@@ -12,20 +6,7 @@ class WS2812
     @brightness = 100
     @buffer = Array.new(num * 3, 0)
     @order = order
-
-    # ESP32: use RMT directly, RP2040/RP2350: use C bindings
-    begin
-      @rmt = RMT.new(pin,
-        t0h_ns: 350,
-        t0l_ns: 800,
-        t1h_ns: 700,
-        t1l_ns: 600,
-        reset_ns: 60000
-      )
-    rescue NameError
-      # RMT not available, use C bindings (RP2040/RP2350)
-      _init(pin)
-    end
+    _init(pin)
   end
 
   def set_rgb(index, r, g, b)
@@ -56,25 +37,7 @@ class WS2812
   end
 
   def show
-    if @rmt
-      # ESP32: keep Ruby implementation for RMT
-      bytes = []
-      scale = @brightness / 100.0
-      @num_leds.times do |i|
-        r = (@buffer[i * 3] * scale).to_i
-        g = (@buffer[i * 3 + 1] * scale).to_i
-        b = (@buffer[i * 3 + 2] * scale).to_i
-        if @order == :rgb
-          bytes << r << g << b
-        else
-          bytes << g << r << b
-        end
-      end
-      @rmt.write(bytes)
-    else
-      # RP2040/RP2350: use optimized C implementation
-      _show(@buffer, @brightness, @order == :rgb ? 1 : 0)
-    end
+    _show(@buffer, @brightness, @order == :rgb ? 1 : 0)
   end
 
   def clear
@@ -83,12 +46,7 @@ class WS2812
   end
 
   def close
-    if @rmt
-      @rmt.close if @rmt.respond_to?(:close)
-      @rmt = nil
-    else
-      _deinit
-    end
+    _deinit
   end
 
   private
