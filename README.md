@@ -8,71 +8,28 @@ A WS2812 LED driver gem for PicoRuby. Supports ESP32 (using RMT peripheral) and 
 - Buffered LED control with explicit `show` command
 - Global brightness control (0-100%)
 - Platform-specific optimized drivers:
-  - ESP32: RMT (Remote Control) peripheral
-  - RP2040/RP2350: PIO (Programmable I/O) peripheral
+  - ESP32: RMT (Remote Control) peripheral via `picoruby-rmt`
+  - RP2040/RP2350: PIO (Programmable I/O) peripheral via `picoruby-pio`
 
 ## Installation
 
 ### ESP32
 
-1. Add the following line to your `picoruby/build_config/xtensa-esp.rb`:
+Add the following line to your `picoruby/build_config/xtensa-esp.rb`:
 
-   ```ruby
-   conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
-   ```
-
-2. Add the following lines to your ESP32 component's `CMakeLists.txt`:
-
-   ```diff
-    idf_component_register(
-      SRCS
-        ...
-        ${COMPONENT_DIR}/picoruby/mrbgems/picoruby-rmt/ports/esp32/rmt.c
-   +    ${COMPONENT_DIR}/picoruby/mrbgems/picoruby-ws2812/ports/esp32/ws2812.c
-        ...
-      INCLUDE_DIRS
-        ...
-   +    ${COMPONENT_DIR}/picoruby/mrbgems/picoruby-ws2812/include
-   +    ${COMPONENT_DIR}/picoruby/mrbgems/picoruby-rmt/include
-        ...
-    )
-   ```
+```ruby
+conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
+```
 
 ### RP2040/RP2350 (R2P2)
 
-1. Add the following line to your build configuration (e.g., `build_config/r2p2-picoruby-pico2.rb`):
+Note: RP2040/RP2350 support requires a recent PicoRuby master branch that includes `picoruby-pio`.
 
-   ```ruby
-   conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
-   ```
+Add the following line to your build configuration (e.g., `build_config/r2p2-picoruby-pico2.rb`):
 
-2. Add the following line to `CMakeLists.txt` to include platform-specific drivers from external gems:
-
-   ```diff
-    file(GLOB SOURCE_FILES CONFIGURE_DEPENDS
-      src/*.c
-      ${CMAKE_SOURCE_DIR}/lib/picoruby/mrbgems/*/ports/rp2040/*.c
-      ${CMAKE_SOURCE_DIR}/lib/picoruby/mrbgems/*/ports/common/*.c
-   +  ${CMAKE_SOURCE_DIR}/lib/picoruby/build/repos/${MRUBY_CONFIG}/*/ports/rp2040/*.c
-    )
-   ```
-
-   ```diff
-    pico_generate_pio_header(${PROJECT_NAME}
-      ${CMAKE_SOURCE_DIR}/lib/picoruby/mrbgems/picoruby-psg/ports/rp2040/psg_drv_mcp4922_pio.pio
-    )
-
-   +pico_generate_pio_header(${PROJECT_NAME}
-   +  ${CMAKE_SOURCE_DIR}/lib/picoruby/build/repos/${MRUBY_CONFIG}/picoruby-ws2812/ports/rp2040/ws2812.pio
-   +)
-   ```
-
-3. Clean and rebuild:
-
-   ```
-   rake picoruby:pico2:clean
-   rake picoruby:pico2:prod
-   ```
+```ruby
+conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
+```
 
 ## Usage
 
@@ -154,13 +111,14 @@ Check out the `examples` directory for more detailed examples, including:
 
 - **RP2040/RP2350** (using PIO peripheral)
   - Hardware-accelerated bit-banging via PIO
+  - PIO program is defined in Ruby using `picoruby-pio` assembler DSL
   - Tested on [Waveshare RP2350-Matrix](https://www.waveshare.com/wiki/RP2350-Matrix)
   - 800kHz WS2812 timing
 
 ## Dependencies
 
-- ESP32: `picoruby-rmt` (automatically added when `ESP32_PLATFORM` is defined)
-- RP2040/RP2350: No additional dependencies (PIO driver is built-in)
+- ESP32: `picoruby-rmt` (automatically added)
+- RP2040/RP2350: `picoruby-pio` (automatically added)
 
 ## Development Boards
 

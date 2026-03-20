@@ -5,5 +5,7 @@ MRuby::Gem::Specification.new('picoruby-ws2812') do |spec|
 
   if build.name.downcase.include?('esp')
     spec.add_dependency 'picoruby-rmt'
+  elsif !build.posix?
+    spec.add_dependency 'picoruby-pio'
   end
 end
