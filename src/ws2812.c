@@ -6,29 +6,12 @@
 #include "../include/ws2812.h"
 
 /*
- * WS2812._init(pin)
- * Initialize WS2812 PIO driver on specified GPIO pin
+ * WS2812._convert(buffer, brightness, color_order)
+ * Apply brightness scaling and color order conversion
+ * Returns a new Array ready for transmission
  */
 static void
-c__init(mrbc_vm *vm, mrbc_value *v, int argc)
-{
-    int pin = GET_INT_ARG(1);
-    int result = WS2812_init((uint8_t)pin);
-
-    if (result < 0) {
-        mrbc_raise(vm, MRBC_CLASS(RuntimeError), "Failed to initialize WS2812");
-        return;
-    }
-
-    SET_NIL_RETURN();
-}
-
-/*
- * WS2812._show(buffer, brightness, color_order)
- * Send pixels with brightness scaling and color order
- */
-static void
-c__show(mrbc_vm *vm, mrbc_value *v, int argc)
+c__convert(mrbc_vm *vm, mrbc_value *v, int argc)
 {
     mrbc_value data = v[1];
     int brightness = GET_INT_ARG(2);
@@ -42,32 +25,29 @@ c__show(mrbc_vm *vm, mrbc_value *v, int argc)
     int len = mrbc_array_size(&data);
     int num_leds = len / 3;
 
-    uint8_t *buf = mrbc_alloc(vm, len);
-    if (!buf) {
-        mrbc_raise(vm, MRBC_CLASS(RuntimeError), "memory allocation failed");
-        return;
+    mrbc_value result = mrbc_array_new(vm, len);
+
+    for (int i = 0; i < num_leds; i++) {
+        uint8_t r = (uint8_t)mrbc_integer(mrbc_array_get(&data, i * 3));
+        uint8_t g = (uint8_t)mrbc_integer(mrbc_array_get(&data, i * 3 + 1));
+        uint8_t b = (uint8_t)mrbc_integer(mrbc_array_get(&data, i * 3 + 2));
+
+        r = (r * brightness) / 100;
+        g = (g * brightness) / 100;
+        b = (b * brightness) / 100;
+
+        if (color_order == WS2812_ORDER_RGB) {
+            mrbc_array_push(&result, &mrbc_integer_value(r));
+            mrbc_array_push(&result, &mrbc_integer_value(g));
+            mrbc_array_push(&result, &mrbc_integer_value(b));
+        } else {  /* GRB (default) */
+            mrbc_array_push(&result, &mrbc_integer_value(g));
+            mrbc_array_push(&result, &mrbc_integer_value(r));
+            mrbc_array_push(&result, &mrbc_integer_value(b));
+        }
     }
 
-    for (int i = 0; i < len; i++) {
-        buf[i] = (uint8_t)mrbc_integer(mrbc_array_get(&data, i));
-    }
-
-    WS2812_show(buf, num_leds, (uint8_t)brightness, (uint8_t)color_order);
-
-    mrbc_free(vm, buf);
-
-    SET_NIL_RETURN();
-}
-
-/*
- * WS2812._deinit
- * Deinitialize WS2812 driver
- */
-static void
-c__deinit(mrbc_vm *vm, mrbc_value *v, int argc)
-{
-    WS2812_deinit();
-    SET_NIL_RETURN();
+    SET_RETURN(result);
 }
 
 /*
@@ -78,7 +58,5 @@ mrbc_ws2812_init(mrbc_vm *vm)
 {
     mrbc_class *mrbc_class_WS2812 = mrbc_define_class(vm, "WS2812", mrbc_class_object);
 
-    mrbc_define_method(vm, mrbc_class_WS2812, "_init", c__init);
-    mrbc_define_method(vm, mrbc_class_WS2812, "_show", c__show);
-    mrbc_define_method(vm, mrbc_class_WS2812, "_deinit", c__deinit);
+    mrbc_define_method(vm, mrbc_class_WS2812, "_convert", c__convert);
 }

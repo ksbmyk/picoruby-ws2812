@@ -1,4 +1,9 @@
+begin; require 'rmt'; rescue LoadError; end
+begin; require 'pio'; rescue LoadError; end
+
 class WS2812
+  WS2812_PIO_PROGRAM = nil
+
   attr_reader :brightness
 
   def initialize(pin:, num:, order: :grb)
@@ -6,7 +11,20 @@ class WS2812
     @brightness = 100
     @buffer = Array.new(num * 3, 0)
     @order = order
-    _init(pin)
+    @rmt = nil
+    @sm = nil
+
+    begin
+      @rmt = RMT.new(pin,
+        t0h_ns: 350,
+        t0l_ns: 800,
+        t1h_ns: 700,
+        t1l_ns: 600,
+        reset_ns: 60000
+      )
+    rescue NameError
+      _init_pio(pin)
+    end
   end
 
   def set_rgb(index, r, g, b)
@@ -37,7 +55,17 @@ class WS2812
   end
 
   def show
-    _show(@buffer, @brightness, @order == :rgb ? 1 : 0)
+    converted = _convert(@buffer, @brightness, @order == :rgb ? 1 : 0)
+    if @rmt
+      @rmt.write(converted)
+    else
+      i = 0
+      while i + 2 < converted.length
+        pixel = (converted[i] << 24) | (converted[i + 1] << 16) | (converted[i + 2] << 8)
+        @sm.put(pixel)
+        i += 3
+      end
+    end
   end
 
   def clear
@@ -46,10 +74,43 @@ class WS2812
   end
 
   def close
-    _deinit
+    @rmt = nil
+    @sm = nil
   end
 
   private
+
+  def _init_pio(pin)
+    program = self.class._pio_program
+    @sm = PIO::StateMachine.new(
+      pio: PIO::PIO0,
+      sm: 0,
+      program: program,
+      freq: 800_000 * 10,
+      sideset_pins: pin,
+      out_shift_right: false,
+      out_shift_autopull: true,
+      out_shift_threshold: 24,
+      fifo_join: PIO::FIFO_JOIN_TX
+    )
+    @sm.start
+  end
+
+  def self._pio_program
+    return WS2812_PIO_PROGRAM if WS2812_PIO_PROGRAM
+
+    PIO.asm(side_set: 1) do
+      wrap_target
+      label :bitloop
+      out :x, 1,                    side: 0, delay: 2
+      jmp :do_zero, cond: :not_x,  side: 1, delay: 1
+      label :do_one
+      jmp :bitloop,                 side: 1, delay: 4
+      label :do_zero
+      nop                           side: 0, delay: 4
+      wrap
+    end
+  end
 
   def hsb_to_rgb(h, s, b)
     h = h % 360
