@@ -8,7 +8,7 @@ class WS2812
 
   def initialize(pin:, num:, order: :grb)
     @num_leds = num
-    @brightness = 100
+    @brightness = 5
     @buffer = Array.new(num * 3, 0)
     @order = order
     @rmt = nil

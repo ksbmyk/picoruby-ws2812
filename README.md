@@ -81,7 +81,7 @@ WS2812.new(pin:, num:, order: :grb)
 | `set_hsb(index, h, s, b)` | Set LED color using HSB (H: 0-360, S: 0-100, B: 0-100) |
 | `fill(r, g, b)` | Fill all LEDs with the same RGB color |
 | `brightness` | Get current brightness (0-100) |
-| `brightness=` | Set brightness (0-100) |
+| `brightness=` | Set brightness (0-100, default: 5) |
 | `show` | Send buffer to LEDs |
 | `clear` | Turn off all LEDs (fills buffer with 0 and calls show) |
 | `close` | Release driver resources |
@@ -93,6 +93,7 @@ WS2812.new(pin:, num:, order: :grb)
 - Out-of-range index values are silently ignored
 - RGB values are masked to 0-255
 - Brightness is applied at `show` time (buffer values are not modified)
+- Default brightness is 5 (5%) for safety — running many LEDs at full brightness draws significant current and can exceed USB power limits
 
 ## Examples
 
