@@ -2,33 +2,27 @@ begin; require 'rmt'; rescue LoadError; end
 begin; require 'pio'; rescue LoadError; end
 
 class WS2812
-  WS2812_PIO_PROGRAM = nil
-
   attr_reader :brightness
 
   def initialize(pin:, num:, order: :grb)
-    @num_leds = num
+    @num = num
     @brightness = 5
     @buffer = Array.new(num * 3, 0)
     @order = order
     @rmt = nil
     @sm = nil
+    @pixel_packed = 0
 
     begin
-      @rmt = RMT.new(pin,
-        t0h_ns: 350,
-        t0l_ns: 800,
-        t1h_ns: 700,
-        t1l_ns: 600,
-        reset_ns: 60000
-      )
+      init_rmt(pin)
     rescue NameError
-      _init_pio(pin)
+      @pixel_packed = 1
+      init_pio(pin)
     end
   end
 
   def set_rgb(index, r, g, b)
-    return if index < 0 || index >= @num_leds
+    return if index < 0 || index >= @num
     @buffer[index * 3]     = r & 0xFF
     @buffer[index * 3 + 1] = g & 0xFF
     @buffer[index * 3 + 2] = b & 0xFF
@@ -47,7 +41,7 @@ class WS2812
   end
 
   def fill(r, g, b)
-    @num_leds.times { |i| set_rgb(i, r, g, b) }
+    @num.times { |i| set_rgb(i, r, g, b) }
   end
 
   def brightness=(val)
@@ -56,9 +50,9 @@ class WS2812
 
   def show
     if @rmt
-      @rmt.write(_convert(@buffer, @brightness, @order == :rgb ? 1 : 0))
+      @rmt.write(_convert)
     else
-      _convert(@buffer, @brightness, @order == :rgb ? 1 : 0, 1).each do |pixel|
+      _convert.each do |pixel|
         @sm.put(pixel)
       end
     end
@@ -77,8 +71,18 @@ class WS2812
 
   private
 
-  def _init_pio(pin)
-    program = self.class._pio_program
+  def init_rmt(pin)
+    @rmt = RMT.new(pin,
+      t0h_ns: 350,
+      t0l_ns: 800,
+      t1h_ns: 700,
+      t1l_ns: 600,
+      reset_ns: 60000
+    )
+  end
+
+  def init_pio(pin)
+    program = self.class.pio_program
     @sm = PIO::StateMachine.new(
       pio: PIO::PIO0,
       sm: 0,
@@ -93,9 +97,7 @@ class WS2812
     @sm.start
   end
 
-  def self._pio_program
-    return WS2812_PIO_PROGRAM if WS2812_PIO_PROGRAM
-
+  def self.pio_program
     PIO.asm(side_set: 1) do
       wrap_target
       label :bitloop
