@@ -52,9 +52,7 @@ class WS2812
     if @rmt
       @rmt.write(_convert)
     else
-      _convert.each do |pixel|
-        @sm.put(pixel)
-      end
+      @sm.put_bytes(_convert)
     end
     nil
   end
