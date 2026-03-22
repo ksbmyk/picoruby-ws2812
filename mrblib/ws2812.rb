@@ -25,7 +25,7 @@ class WS2812
       )
     rescue NameError
       @pixel_packed = 1
-      _init_pio(pin)
+      init_pio(pin)
     end
   end
 
@@ -79,8 +79,8 @@ class WS2812
 
   private
 
-  def _init_pio(pin)
-    program = self.class._pio_program
+  def init_pio(pin)
+    program = self.class.pio_program
     @sm = PIO::StateMachine.new(
       pio: PIO::PIO0,
       sm: 0,
@@ -95,7 +95,7 @@ class WS2812
     @sm.start
   end
 
-  def self._pio_program
+  def self.pio_program
     return WS2812_PIO_PROGRAM if WS2812_PIO_PROGRAM
 
     PIO.asm(side_set: 1) do
