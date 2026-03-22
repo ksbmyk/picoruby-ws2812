@@ -5,19 +5,22 @@
 #include <mrubyc.h>
 #include "../include/ws2812.h"
 
+#define GETIV(str) mrbc_instance_getiv(&v[0], mrbc_str_to_symid(#str))
+
 /*
- * WS2812._convert(buffer, brightness, color_order, pack32)
- * Apply brightness scaling and color order conversion
- * pack32 == 0: returns byte Array [c1, c2, c3, ...] (for RMT)
- * pack32 != 0: returns 32-bit packed Array [0xC1C2C300, ...] (for PIO)
+ * WS2812._convert
+ * Apply brightness scaling and color order conversion using instance variables
+ * @pixel_packed == 0: returns byte Array [c1, c2, c3, ...] (for RMT)
+ * @pixel_packed != 0: returns 32-bit packed Array [0xC1C2C300, ...] (for PIO)
  */
 static void
 c__convert(mrbc_vm *vm, mrbc_value *v, int argc)
 {
-    mrbc_value data = v[1];
-    int brightness = GET_INT_ARG(2);
-    int color_order = GET_INT_ARG(3);
-    int pack32 = (argc >= 4) ? GET_INT_ARG(4) : 0;
+    mrbc_value data = GETIV(buffer);
+    int brightness = mrbc_integer(GETIV(brightness));
+    mrbc_sym rgb_sym = mrbc_str_to_symid("rgb");
+    int color_order = (GETIV(order).sym_id == rgb_sym) ? WS2812_ORDER_RGB : WS2812_ORDER_GRB;
+    int pack32 = mrbc_integer(GETIV(pixel_packed));
 
     if (mrbc_type(data) != MRBC_TT_ARRAY) {
         mrbc_raise(vm, MRBC_CLASS(ArgumentError), "data must be an Array");

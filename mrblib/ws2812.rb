@@ -13,6 +13,7 @@ class WS2812
     @order = order
     @rmt = nil
     @sm = nil
+    @pixel_packed = 0
 
     begin
       @rmt = RMT.new(pin,
@@ -23,6 +24,7 @@ class WS2812
         reset_ns: 60000
       )
     rescue NameError
+      @pixel_packed = 1
       _init_pio(pin)
     end
   end
@@ -56,9 +58,9 @@ class WS2812
 
   def show
     if @rmt
-      @rmt.write(_convert(@buffer, @brightness, @order == :rgb ? 1 : 0))
+      @rmt.write(_convert)
     else
-      _convert(@buffer, @brightness, @order == :rgb ? 1 : 0, 1).each do |pixel|
+      _convert.each do |pixel|
         @sm.put(pixel)
       end
     end
