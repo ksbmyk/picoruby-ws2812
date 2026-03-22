@@ -27,10 +27,9 @@ c__convert(mrbc_vm *vm, mrbc_value *v, int argc)
         return;
     }
 
-    int len = mrbc_array_size(&data);
-    int num_leds = len / 3;
+    int num_leds = mrbc_integer(GETIV(num));
 
-    mrbc_value result = mrbc_array_new(vm, pack32 ? num_leds : len);
+    mrbc_value result = mrbc_array_new(vm, pack32 ? num_leds : num_leds * 3);
 
     for (int i = 0; i < num_leds; i++) {
         uint8_t r = (uint8_t)mrbc_integer(mrbc_array_get(&data, i * 3));

@@ -5,7 +5,7 @@ class WS2812
   attr_reader :brightness
 
   def initialize(pin:, num:, order: :grb)
-    @num_leds = num
+    @num = num
     @brightness = 5
     @buffer = Array.new(num * 3, 0)
     @order = order
@@ -22,7 +22,7 @@ class WS2812
   end
 
   def set_rgb(index, r, g, b)
-    return if index < 0 || index >= @num_leds
+    return if index < 0 || index >= @num
     @buffer[index * 3]     = r & 0xFF
     @buffer[index * 3 + 1] = g & 0xFF
     @buffer[index * 3 + 2] = b & 0xFF
@@ -41,7 +41,7 @@ class WS2812
   end
 
   def fill(r, g, b)
-    @num_leds.times { |i| set_rgb(i, r, g, b) }
+    @num.times { |i| set_rgb(i, r, g, b) }
   end
 
   def brightness=(val)
