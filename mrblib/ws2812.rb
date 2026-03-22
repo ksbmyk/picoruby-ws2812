@@ -2,8 +2,6 @@ begin; require 'rmt'; rescue LoadError; end
 begin; require 'pio'; rescue LoadError; end
 
 class WS2812
-  WS2812_PIO_PROGRAM = nil
-
   attr_reader :brightness
 
   def initialize(pin:, num:, order: :grb)
@@ -96,8 +94,6 @@ class WS2812
   end
 
   def self.pio_program
-    return WS2812_PIO_PROGRAM if WS2812_PIO_PROGRAM
-
     PIO.asm(side_set: 1) do
       wrap_target
       label :bitloop
