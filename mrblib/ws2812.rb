@@ -14,13 +14,7 @@ class WS2812
     @pixel_packed = 0
 
     begin
-      @rmt = RMT.new(pin,
-        t0h_ns: 350,
-        t0l_ns: 800,
-        t1h_ns: 700,
-        t1l_ns: 600,
-        reset_ns: 60000
-      )
+      init_rmt(pin)
     rescue NameError
       @pixel_packed = 1
       init_pio(pin)
@@ -76,6 +70,16 @@ class WS2812
   end
 
   private
+
+  def init_rmt(pin)
+    @rmt = RMT.new(pin,
+      t0h_ns: 350,
+      t0l_ns: 800,
+      t1h_ns: 700,
+      t1l_ns: 600,
+      reset_ns: 60000
+    )
+  end
 
   def init_pio(pin)
     program = self.class.pio_program
