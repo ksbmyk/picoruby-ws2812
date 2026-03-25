@@ -11,12 +11,10 @@ class WS2812
     @order = order
     @rmt = nil
     @sm = nil
-    @pixel_packed = 0
 
     begin
       init_rmt(pin)
     rescue NameError
-      @pixel_packed = 1
       init_pio(pin)
     end
   end
@@ -41,7 +39,11 @@ class WS2812
   end
 
   def fill(r, g, b)
-    @num.times { |i| set_rgb(i, r, g, b) }
+    i = @num
+    while 0 < i
+      i -= 1
+      set_rgb(i, r, g, b)
+    end
   end
 
   def brightness=(val)
@@ -58,7 +60,7 @@ class WS2812
   end
 
   def clear
-    @buffer.size.times { |i| @buffer[i] = 0 }
+    fill(0, 0, 0)
     show
   end
 
@@ -116,10 +118,10 @@ class WS2812
     buf = @buffer
     br = @brightness
     rgb = @order == :rgb
-    pack = @pixel_packed != 0
+    pack = @rmt == nil
     j = 0
-    i = 0
-    while i < @num
+    i = @num
+    while 0 < i
       r = (buf[j]     * br) / 100
       g = (buf[j + 1] * br) / 100
       b = (buf[j + 2] * br) / 100
@@ -136,7 +138,7 @@ class WS2812
         result << c1 << c2 << c3
       end
       j += 3
-      i += 1
+      i -= 1
     end
     result
   end

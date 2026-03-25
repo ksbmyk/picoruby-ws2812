@@ -18,14 +18,7 @@ For large LED counts or high-framerate animations, see [picoruby-ws2812-plus](ht
 
 ## Installation
 
-Install as a RuntimeGem (no build required):
-
-```ruby
-# On PicoRuby shell
-gem install ws2812
-```
-
-Or add to your build configuration:
+Add the following line to your build configuration:
 
 ```ruby
 conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
