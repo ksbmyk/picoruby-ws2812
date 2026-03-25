@@ -1,31 +1,31 @@
 # picoruby-ws2812
 
-A WS2812 LED driver gem for PicoRuby. Supports ESP32 (using RMT peripheral) and RP2040/RP2350 (using PIO peripheral).
+A pure Ruby WS2812 LED driver gem for PicoRuby. Available as a [RuntimeGem](https://github.com/picoruby/runtimegems) — no build required.
+
+Supports ESP32 (using RMT peripheral) and RP2040/RP2350 (using PIO peripheral).
+
+For large LED counts or high-framerate animations, see [picoruby-ws2812-plus](https://github.com/ksbmyk/picoruby-ws2812-plus) (C-accelerated version with the same API).
 
 ## Features
 
+- Pure Ruby implementation — works as a RuntimeGem
 - Control LEDs using RGB values, hexadecimal color codes, or HSB values
 - Buffered LED control with explicit `show` command
 - Global brightness control (0-100%)
-- Platform-specific optimized drivers:
+- Platform-specific drivers:
   - ESP32: RMT (Remote Control) peripheral via `picoruby-rmt`
   - RP2040/RP2350: PIO (Programmable I/O) peripheral via `picoruby-pio`
 
 ## Installation
 
-### ESP32
-
-Add the following line to your `picoruby/build_config/xtensa-esp.rb`:
+Install as a RuntimeGem (no build required):
 
 ```ruby
-conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
+# On PicoRuby shell
+gem install ws2812
 ```
 
-### RP2040/RP2350 (R2P2)
-
-Note: RP2040/RP2350 support requires a recent PicoRuby master branch that includes `picoruby-pio`.
-
-Add the following line to your build configuration (e.g., `build_config/r2p2-picoruby-pico2.rb`):
+Or add to your build configuration:
 
 ```ruby
 conf.gem github: 'ksbmyk/picoruby-ws2812', branch: 'main'
@@ -46,9 +46,6 @@ led.set_hsb(2, 240, 100, 100)  # LED 2: Blue (H: 0-360, S: 0-100, B: 0-100)
 
 # Fill all LEDs with the same color
 led.fill(255, 255, 255)        # All white
-
-# Adjust brightness (0-100%)
-led.brightness = 50
 
 # Send buffer to LEDs
 led.show

@@ -109,6 +109,38 @@ class WS2812
     end
   end
 
+  # Apply brightness scaling and color order conversion.
+  # C-accelerated version available in picoruby-ws2812-plus.
+  def _convert
+    result = []
+    buf = @buffer
+    br = @brightness
+    rgb = @order == :rgb
+    pack = @pixel_packed != 0
+    j = 0
+    i = 0
+    while i < @num
+      r = (buf[j]     * br) / 100
+      g = (buf[j + 1] * br) / 100
+      b = (buf[j + 2] * br) / 100
+
+      if rgb
+        c1, c2, c3 = r, g, b
+      else
+        c1, c2, c3 = g, r, b
+      end
+
+      if pack
+        result << ((c1 << 24) | (c2 << 16) | (c3 << 8))
+      else
+        result << c1 << c2 << c3
+      end
+      j += 3
+      i += 1
+    end
+    result
+  end
+
   def hsb_to_rgb(h, s, b)
     h = h % 360
     s = s / 100.0
