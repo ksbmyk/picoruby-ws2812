@@ -13,8 +13,6 @@ class WS2812
 
   private
 
+  def _convert: () -> Array[Integer]
   def hsb_to_rgb: (Integer h, Integer s, Integer b) -> [Integer, Integer, Integer]
-  def _init: (Integer pin) -> void
-  def _show: (Array[Integer] buffer, Integer brightness, Integer color_order) -> void
-  def _deinit: () -> void
 end
