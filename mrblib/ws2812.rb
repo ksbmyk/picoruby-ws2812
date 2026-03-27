@@ -54,7 +54,7 @@ class WS2812
     if @rmt
       @rmt.write(_convert)
     else
-      @sm.put_bytes(_convert)
+      @sm.put_buffer(_convert)
     end
     nil
   end
