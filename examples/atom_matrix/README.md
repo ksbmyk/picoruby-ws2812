@@ -15,9 +15,9 @@ ATOM Matrix Product reference: https://www.switch-science.com/products/6260
 The 25 LEDs are arranged in a 5x5 matrix with the following physical layout:
 ```
  0  1  2  3  4
- 9  8  7  6  5
+ 5  6  7  8  9
 10 11 12 13 14
-19 18 17 16 15
+15 16 17 18 19
 20 21 22 23 24
 ```
 
@@ -29,30 +29,17 @@ The 25 LEDs are arranged in a 5x5 matrix with the following physical layout:
 
 ## How Coordinates Work in sequence_animation.rb
 
-By default, the LEDs are controlled in their physical connection order (0 to 24). The `AtomMatrix` class in `sequence_animation.rb` converts this physical order into a coordinate system for easier programming.
-
-The `show` method in `AtomMatrix` class converts the 2D coordinates (x,y) to the physical LED numbers:
+The LEDs are wired in row major order, so a 2D coordinate maps to an LED number with a single multiplication. That is the whole conversion `sequence_animation.rb` does:
 
 ```ruby
-def show
-  pixels = []
-  5.times do |y|
-    5.times do |x|
-      # Convert 2D coordinates to physical LED number
-      # For example: (0,0) -> 0, (1,0) -> 1, (0,1) -> 9, etc.
-      pixels << @matrix[y][x]
-    end
-  end
-  @led.show_rgb(*pixels)
-end
+index = y * grid_size + x
 ```
 
-This conversion maps the coordinates to the physical LED numbers in the following way:
 - First row (y=0): (0,0)->0, (1,0)->1, (2,0)->2, (3,0)->3, (4,0)->4
-- Second row (y=1): (0,1)->9, (1,1)->8, (2,1)->7, (3,1)->6, (4,1)->5
-- And so on...
+- Second row (y=1): (0,1)->5, (1,1)->6, (2,1)->7, (3,1)->8, (4,1)->9
+- And so on, up to (4,4)->24
 
-You can modify the `show` method to change how the physical LED numbers map to coordinates.
+No lookup table or zigzag correction is needed.
 
 ## Usage
 
